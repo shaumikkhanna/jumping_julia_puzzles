@@ -1,2 +1,3 @@
-# jumping_julia_puzzles
-This is a basic retrieval method for 100+ jumping julia puzzles over different difficulties
+## Jumping Julia puzzles
+
+##### This is a basic retrieval system for 100+ jumping julia puzzles over varying difficulty

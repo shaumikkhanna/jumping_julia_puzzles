@@ -19,15 +19,15 @@ function showPuzzle() {
 
 	// Determine the image path based on whether the solution is being shown
 	const imagePath = showSolution
-		? `https://shaumikkhanna.github.io/jumping_julia_puzzles/boards/${difficulty}/jumping_julia_solution_${puzzleNumber}.png`
-		: `https://shaumikkhanna.github.io/jumping_julia_puzzles/boards/${difficulty}/jumping_julia_board_${puzzleNumber}.png`;
+		? `/boards/${difficulty}/jumping_julia_solution_${puzzleNumber}.png`
+		: `/boards/${difficulty}/jumping_julia_board_${puzzleNumber}.png`;
 
 	puzzleContainer.innerHTML = `<img src="${imagePath}" alt="Puzzle Image" style="max-width: 100%; height: auto;">`;
 
 	// Determine the text file path based on the selections
 	const textFilePath = showSolution
-		? `https://shaumikkhanna.github.io/jumping_julia_puzzles/boards/${difficulty}/jumping_julia_path_${puzzleNumber}.txt`
-		: `https://shaumikkhanna.github.io/jumping_julia_puzzles/boards/${difficulty}/jumping_julia_board_${puzzleNumber}.txt`;
+		? `/boards/${difficulty}/jumping_julia_path_${puzzleNumber}.txt`
+		: `/boards/${difficulty}/jumping_julia_board_${puzzleNumber}.txt`;
 
 	// Load the text file content into the textContainer
 	fetch(textFilePath)

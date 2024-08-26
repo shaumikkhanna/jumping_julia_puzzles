@@ -1,10 +1,7 @@
-from collections import deque
-
-
 class Chessboard:
     def __init__(self, board):
         self.board = board
-
+        self.paths = set()
 
     def neighbors(self, square):
         x, y = square
@@ -27,54 +24,28 @@ class Chessboard:
         return [(i, j) for i, j in out if 0 <= i < 8 and 0 <= j < 8]
     
 
-    def find_all_paths(self): #TODO
-        start = (0, 0)
-        end = (7, 7)
+    def find_paths_from_u(self, u, visited, path):
+        """Finds all paths from square u to the end using a recursive DFS approach."""
 
-        queue = [[start]]
-        paths = []
-        visited = set()
+        visited[u[0]][u[1]] = True
+        path.append(u)
 
-        while queue:
-            path = queue.pop(0)
-            node = path[-1]
-
-            if node == end:
-                paths.append(path)
-            else:
-                for neighbor in self.neighbors(node):
-                    if neighbor not in visited:
-                        new_path = list(path)
-                        new_path.append(neighbor)
-                        queue.append(new_path)
-                        visited.add(neighbor)
-
-        return paths
-    
-    def find_paths_iterative(self): #TODO
-        """Finds all paths from top-left (0, 0) to bottom-right (7, 7) using an iterative BFS approach."""
-        start = (0, 0)
-        end = (7, 7)
+        if u == (7, 7):
+            self.paths.add(str(path))
+            print(path)
+        else:
+            for neighbor in self.neighbors(u):
+                if not visited[neighbor[0]][neighbor[1]]:
+                    self.find_paths_from_u(neighbor, visited, path)
         
-        # Queue to store the paths to explore
-        queue = deque([([start], {start})])
-        all_paths = []
+        path.pop()
+        visited[u[0]][u[1]] = False
 
-        while queue:
-            path, visited = queue.popleft()
-            current = path[-1]
-            
-            if current == end:
-                all_paths.append(path)
-            else:
-                for neighbor in self.neighbors(current):
-                    if neighbor not in visited:  # Check if neighbor is visited
-                        new_visited = visited.copy()
-                        new_visited.add(neighbor)
-                        new_path = path + [neighbor]
-                        queue.append((new_path, new_visited))
 
-        return all_paths
+    def find_paths_from_start(self):
+        visited = [[False for _ in range(8)] for _ in range(8)]
+        path = []
+        self.find_paths_from_u((0, 0), visited, path)
     
 
 
@@ -102,6 +73,7 @@ b = [
 
 
 if __name__ == '__main__':
-    cb = Chessboard(b)
-    paths = cb.find_paths_iterative()
+    cb = Chessboard(original)
+    paths = cb.find_paths_from_start()
     print(paths)
+    print(len(paths))

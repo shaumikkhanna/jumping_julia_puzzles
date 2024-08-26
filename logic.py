@@ -109,7 +109,7 @@ class Board:
             self.board[square[0]][square[1]] = distance
 
         
-    def fill_remaining_squares(self, show_duds=False):
+    def fill_remaining_squares(self, show_duds=False, restart_for_zeros=False):
         self.board[self.m - 1][self.n - 1] = 'X'
 
         dud_squares = []
@@ -126,7 +126,13 @@ class Board:
             for distance in possible_distances:
                 if all(neighbor not in self.path for neighbor in self.neighbors((i, j), distance)):
                     self.board[i][j] = f'{distance}X' if show_duds else distance
-                    break                    
+                    break  
+            else:
+                if restart_for_zeros:
+                    self.board = [[0 for _ in range(self.n)] for _ in range(self.m)]
+                    self.create_random_path()
+                    self.fill_remaining_squares(show_duds=show_duds, restart_for_zeros=restart_for_zeros)
+                    return
 
 
     def all_possible_paths(self): #TODO
@@ -216,39 +222,40 @@ class Board:
 
 # print(b)
 
-concerns = []
+concerns = [11, 12, 14, 29]
 
 if __name__ == "__main__":
 
-    # for index in range(1, 36):
-    # for index in concerns:
+    # for board_index in range(1, 36):
+    # for board_index in concerns:
     #     b = Board(4, 4, max_distance=3)
-    #     b.create_random_path(difficulty_bias=0.15 + 0.1*(index/30))
-    #     b.fill_remaining_squares(show_duds=False)
-    #     b.create_board_text_file(filename=f"boards/4x4/jumping_julia_board_{index}.txt")
-    #     b.create_path_text_file(filename=f"boards/4x4/jumping_julia_path_{index}.txt")
-    #     b.create_board_image(filename=f"boards/4x4/jumping_julia_board_{index}.png")
-    #     b.create_board_image(filename=f"boards/4x4/jumping_julia_solution_{index}.png", show_path=True)
-    #     print(f'Board {index} created. (4x4)')
+    #     b.create_random_path(difficulty_bias=0.15 + 0.1*(board_index/30))
+    #     b.fill_remaining_squares(show_duds=False, restart_for_zeros=True)
+    #     b.create_board_text_file(filename=f"boards/easy/jumping_julia_board_{board_index}.txt")
+    #     b.create_path_text_file(filename=f"boards/easy/jumping_julia_path_{board_index}.txt")
+    #     b.create_board_image(filename=f"boards/easy/jumping_julia_board_{board_index}.png")
+    #     b.create_board_image(filename=f"boards/easy/jumping_julia_solution_{board_index}.png", show_path=True)
+    #     print(f'Board {board_index} created. (easy)')
 
-    # for index in range(1, 36):
-    # for index in concerns:
+    # for board_index in range(1, 36):
+    # for board_index in concerns:
     #     b = Board(6, 6)
-    #     b.create_random_path(difficulty_bias=0.15 + 0.1*(index/30))
-    #     b.fill_remaining_squares(show_duds=False)
-    #     b.create_board_text_file(filename=f"boards/6x6/jumping_julia_board_{index}.txt")
-    #     b.create_path_text_file(filename=f"boards/6x6/jumping_julia_path_{index}.txt")
-    #     b.create_board_image(filename=f"boards/6x6/jumping_julia_board_{index}.png")
-    #     b.create_board_image(filename=f"boards/6x6/jumping_julia_solution_{index}.png", show_path=True)
-    #     print(f'Board {index} created. (6x6)')
+    #     b.create_random_path(difficulty_bias=0.15 + 0.1*(board_index/30))
+    #     b.fill_remaining_squares(show_duds=False, restart_for_zeros=True)
+    #     b.create_board_text_file(filename=f"boards/medium/jumping_julia_board_{board_index}.txt")
+    #     b.create_path_text_file(filename=f"boards/medium/jumping_julia_path_{board_index}.txt")
+    #     b.create_board_image(filename=f"boards/medium/jumping_julia_board_{board_index}.png")
+    #     b.create_board_image(filename=f"boards/medium/jumping_julia_solution_{board_index}.png", show_path=True)
+    #     print(f'Board {board_index} created. (medium)')
 
-    for index in range(1, 36):
+    # for board_index in range(1, 36):
+    for board_index in concerns:
         b = Board(8, 8)
-        b.create_random_path(difficulty_bias=0.15 + 0.1*(index/30))
-        b.fill_remaining_squares(show_duds=False)
-        b.create_board_text_file(filename=f"boards/8x8/jumping_julia_board_{index}.txt")
-        b.create_path_text_file(filename=f"boards/8x8/jumping_julia_path_{index}.txt")
-        b.create_board_image(filename=f"boards/8x8/jumping_julia_board_{index}.png")
-        b.create_board_image(filename=f"boards/8x8/jumping_julia_solution_{index}.png", show_path=True)
-        print(f'Board {index} created. (8x8)')
+        b.create_random_path(difficulty_bias=0.15 + 0.1*(board_index/30))
+        b.fill_remaining_squares(show_duds=False, restart_for_zeros=True)
+        b.create_board_text_file(filename=f"boards/hard/jumping_julia_board_{board_index}.txt")
+        b.create_path_text_file(filename=f"boards/hard/jumping_julia_path_{board_index}.txt")
+        b.create_board_image(filename=f"boards/hard/jumping_julia_board_{board_index}.png")
+        b.create_board_image(filename=f"boards/hard/jumping_julia_solution_{board_index}.png", show_path=True)
+        print(f'Board {board_index} created. (hard)')
 

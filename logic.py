@@ -1,7 +1,7 @@
 import random
 # import matplotlib.pyplot as plt
 # import matplotlib.patches as patches
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
 # import numpy as np
 from matplotlib import colormaps
 from matplotlib.colors import Normalize
@@ -20,6 +20,25 @@ class Board:
 
     def __str__(self):
         return "\n".join(" ".join(f'{cell: <5}' for cell in row) for row in self.board)
+    
+    @classmethod
+    def from_file(cls, board_filename, path_filename=None):
+        out = []
+        with open(board_filename) as f:
+            for line in f.readlines():
+                out.append([int(x) if x.isdigit() else x for x in line.split()])
+
+        new_board = cls(len(out), len(out[0]))
+        new_board.board = out
+
+        if path_filename is not None:
+            out = []
+            with open(path_filename) as f:
+                for line in f.readlines():
+                    out.append(tuple(map(int, line.split())))
+            new_board.path = out
+
+        return new_board
 
     def neighbors(self, square, distance, difficulty_bias=1):
         """
@@ -159,12 +178,33 @@ class Board:
 
     def number_to_color(self, number):
         if type(number) == str:
-            number = -1
+            number = 0
         
-        norm = Normalize(vmin=-1, vmax=self.max_distance + 1)
-        colormap = colormaps['PuBu']  # Try different colormaps here
+        norm = Normalize(vmin=0, vmax=self.max_distance + 1)
+        colormap = colormaps['Blues']  # Try different colormaps here
         rgba = colormap(norm(number))
         return '#{:02x}{:02x}{:02x}'.format(int(rgba[0]*255), int(rgba[1]*255), int(rgba[2]*255))
+
+
+    @staticmethod
+    def add_drop_shadow(image, offset=(5, 5), background_color=0xffffff, shadow_color=0x000000, border=10, iterations=5):
+        total_width = image.width + abs(offset[0]) + 2 * border
+        total_height = image.height + abs(offset[1]) + 2 * border
+        shadow = Image.new(image.mode, (total_width, total_height), background_color)
+        
+        shadow_left = border + max(offset[0], 0)
+        shadow_top = border + max(offset[1], 0)
+        
+        shadow.paste(shadow_color, [shadow_left, shadow_top, shadow_left + image.width, shadow_top + image.height])
+        
+        for _ in range(iterations):
+            shadow = shadow.filter(ImageFilter.BLUR)
+        
+        img = Image.new(image.mode, (total_width, total_height), background_color)
+        img.paste(shadow, (0, 0))
+        img.paste(image, (border, border))
+        
+        return img
 
 
     def create_board_image(self, filename="jumping_julia_board.png", show_path=False):
@@ -186,22 +226,30 @@ class Board:
                 
                 top_left_corner = (j * cell_size, i * cell_size)
                 bottom_right_corner = ((j + 1) * cell_size, (i + 1) * cell_size)
-                draw.rectangle([top_left_corner, bottom_right_corner], fill=color)
+                x0, y0 = top_left_corner
+                x1, y1 = bottom_right_corner
+    
+                # Determine if the cell is part of the path
+                if show_path and (i, j) in self.path:
+                    outline_color = "yellow"
+                    outline_width = 5
+                else:
+                    outline_color = "black"
+                    outline_width = 2
+
+                # Draw the rounded rectangle with an outline for path cells
+                draw.rounded_rectangle([x0, y0, x1, y1], radius=20, fill=color, outline=outline_color, width=outline_width)
+                
                 text_position = (j * cell_size + cell_size // 2, i * cell_size + cell_size // 2)
                 draw.text(text_position, str(number), fill="black", font=font, anchor="mm")
 
         if show_path:
-            for index, (x, y) in enumerate(self.path):
-
-                top_left_corner = (y * cell_size, x * cell_size)  # Note: (x, y) -> (row, column)
-                bottom_right_corner = ((y + 1) * cell_size, (x + 1) * cell_size)
-                draw.rectangle([top_left_corner, bottom_right_corner], outline="yellow", width=5)
-        
+            for index, (x, y) in enumerate(self.path):                
                 # Draw the sequential number in the top-right corner of each square
                 number_position = (y * cell_size + cell_size - 25, x * cell_size + 15)
                 draw.text(number_position, str(index + 1), fill="yellow", font=small_font, anchor="mm")
     
-        
+        img = Board.add_drop_shadow(img, offset=(10, 10), shadow_color="black", border=20)
         # img.show()  # For preview
         img.save(filename)  # Save the image as a file
 
@@ -222,9 +270,19 @@ class Board:
 
 # print(b)
 
-concerns = [11, 12, 14, 29]
+concerns = []
 
 if __name__ == "__main__":
+    for board_index in range(1, 36):
+        difficulty = 'hard'
+        b = Board.from_file(
+            board_filename=f"boards/{difficulty}/jumping_julia_board_{board_index}.txt", 
+            path_filename=f"boards/{difficulty}/jumping_julia_path_{board_index}.txt"
+        )
+        b.create_board_image(filename=f"boards/{difficulty}/jumping_julia_board_{board_index}.png")
+        b.create_board_image(filename=f"boards/{difficulty}/jumping_julia_solution_{board_index}.png", show_path=True)
+        print(f'Board {board_index} created. ({difficulty})')
+
 
     # for board_index in range(1, 36):
     # for board_index in concerns:
@@ -249,13 +307,13 @@ if __name__ == "__main__":
     #     print(f'Board {board_index} created. (medium)')
 
     # for board_index in range(1, 36):
-    for board_index in concerns:
-        b = Board(8, 8)
-        b.create_random_path(difficulty_bias=0.15 + 0.1*(board_index/30))
-        b.fill_remaining_squares(show_duds=False, restart_for_zeros=True)
-        b.create_board_text_file(filename=f"boards/hard/jumping_julia_board_{board_index}.txt")
-        b.create_path_text_file(filename=f"boards/hard/jumping_julia_path_{board_index}.txt")
-        b.create_board_image(filename=f"boards/hard/jumping_julia_board_{board_index}.png")
-        b.create_board_image(filename=f"boards/hard/jumping_julia_solution_{board_index}.png", show_path=True)
-        print(f'Board {board_index} created. (hard)')
+    # for board_index in concerns:
+    #     b = Board(8, 8)
+    #     b.create_random_path(difficulty_bias=0.15 + 0.1*(board_index/30))
+    #     b.fill_remaining_squares(show_duds=False, restart_for_zeros=True)
+    #     b.create_board_text_file(filename=f"boards/hard/jumping_julia_board_{board_index}.txt")
+    #     b.create_path_text_file(filename=f"boards/hard/jumping_julia_path_{board_index}.txt")
+    #     b.create_board_image(filename=f"boards/hard/jumping_julia_board_{board_index}.png")
+    #     b.create_board_image(filename=f"boards/hard/jumping_julia_solution_{board_index}.png", show_path=True)
+    #     print(f'Board {board_index} created. (hard)')
 

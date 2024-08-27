@@ -27,11 +27,13 @@ class Chessboard:
         return True
 
 
-    def neighbors(self, square, piece=None, difficulty_bias=1):
+    def neighbors(self, square, piece, difficulty_bias=1):
+        """
+        List of neighbors of a square given the piece that the square has.
+        """
+        
         x, y = square
-        if piece is None:
-            piece = self.board[x][y]
-
+ 
         # Pawn movement
         if piece[0] == 'p':
             if random.random() < difficulty_bias:
@@ -76,8 +78,9 @@ class Chessboard:
 
     def all_neighbors_and_pieces(self, square, shuffled=True, difficulty_bias=1):
         """
-        Returns a list of all possible neighbors of a cell along with what piece that 
-        square will have to be to get that neighbor.
+        Returns a list of all possible neighbors of a cell along with a list of what 
+        chesspieces that square will have to house to get that neighbor. In the format --
+        [ (neigbor:tup, pieces:list) ]
         """
         
         x, y = square
@@ -132,16 +135,20 @@ class Chessboard:
 
 
     def create_random_path(self, difficulty_bias=0.25):
-        self.path = [(0, 0)]
+        self.path = []
         path_pieces = []
 
         current_square = (0, 0)
+
         bad_squares = []
         affected_squares = []
 
         while current_square != (7, 7):
+            
             print(f'Path: {self.path}\nCurrent Square: {current_square}\nAffected Squares: {affected_squares}\nBad Squares: {bad_squares}\nPath Pieces: {path_pieces}\n')
-            for neighbor, pieces in self.all_neighbors_and_pieces(current_square, difficulty_bias=difficulty_bias):
+            
+            possible_neighbors = self.all_neighbors_and_pieces(current_square, difficulty_bias=difficulty_bias)
+            for neighbor, pieces in possible_neighbors: #TODO here
                 
                 # Found next square if it is 
                 # 1) A new square ie not in the path

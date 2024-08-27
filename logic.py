@@ -16,11 +16,18 @@ class Board:
         else:
             self.max_distance = max_distance
 
+
     def __str__(self):
         return "\n".join(" ".join(f'{cell: <5}' for cell in row) for row in self.board)
-    
+
+
     @classmethod
     def from_file(cls, board_filename, path_filename=None):
+        """
+        Constructor to create a board object from a text file for the board.
+        A path file can also be provided.
+        """
+
         out = []
         with open(board_filename) as f:
             for line in f.readlines():
@@ -38,9 +45,10 @@ class Board:
 
         return new_board
 
+
     def neighbors(self, square, distance, difficulty_bias=1):
         """
-        List of neighbors of a square at an exact certain distance.
+        List of neighbors of a square at an given exact certain distance.
         """
         neighbors = []
 
@@ -60,10 +68,12 @@ class Board:
         
         return neighbors
     
+
     def all_neighbors_and_distances(self, square, shuffled=True, difficulty_bias=1):
         """
         Returns a list of all neighbors of a square at all possible 
-        distances. In the format- (distance:int, neighbor:tup)
+        distances. In the format -- 
+        [ (distance:int, neighbor:tup) ]
         """
 
         possible_distances = range(1, self.max_distance + 1)

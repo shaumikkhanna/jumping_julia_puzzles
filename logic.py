@@ -101,7 +101,7 @@ class Board:
                 # 1) A new square ie not in the path
                 # 2) Not a bad square ie has neighbors that are not in the path
                 # 3) Does not touch the path with a certain distance
-                if neighbor not in self.path + bad_squares and all(neighbor not in as_ for as_ in affected_squares):
+                if neighbor not in self.path and neighbor not in bad_squares and all(neighbor not in as_ for as_ in affected_squares):
                     next_square = neighbor
                     next_to_distance = distance
                     bad_squares = []

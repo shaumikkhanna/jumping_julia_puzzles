@@ -1,8 +1,6 @@
 import random
 # import matplotlib.pyplot as plt
-# import matplotlib.patches as patches
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
-# import numpy as np
 from matplotlib import colormaps
 from matplotlib.colors import Normalize
 
@@ -273,15 +271,23 @@ class Board:
 concerns = []
 
 if __name__ == "__main__":
-    for board_index in range(1, 36):
-        difficulty = 'hard'
-        b = Board.from_file(
-            board_filename=f"boards/{difficulty}/jumping_julia_board_{board_index}.txt", 
-            path_filename=f"boards/{difficulty}/jumping_julia_path_{board_index}.txt"
-        )
-        b.create_board_image(filename=f"boards/{difficulty}/jumping_julia_board_{board_index}.png")
-        b.create_board_image(filename=f"boards/{difficulty}/jumping_julia_solution_{board_index}.png", show_path=True)
-        print(f'Board {board_index} created. ({difficulty})')
+    random.seed(42)
+    b = Board(4, 4, max_distance=3)
+    b.create_random_path(difficulty_bias=0.25)
+    b.fill_remaining_squares(show_duds=True, restart_for_zeros=False)
+    print(b)
+
+
+
+    # for board_index in range(1, 36):
+    #     difficulty = 'hard'
+    #     b = Board.from_file(
+    #         board_filename=f"boards/{difficulty}/jumping_julia_board_{board_index}.txt", 
+    #         path_filename=f"boards/{difficulty}/jumping_julia_path_{board_index}.txt"
+    #     )
+    #     b.create_board_image(filename=f"boards/{difficulty}/jumping_julia_board_{board_index}.png")
+    #     b.create_board_image(filename=f"boards/{difficulty}/jumping_julia_solution_{board_index}.png", show_path=True)
+    #     print(f'Board {board_index} created. ({difficulty})')
 
 
     # for board_index in range(1, 36):

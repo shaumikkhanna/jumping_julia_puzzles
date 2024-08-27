@@ -82,24 +82,36 @@ class Board:
 
 
     def create_random_path(self, difficulty_bias=0.25):
-        self.path = [(0, 0)]
+        # These will be updated when there is a permanant change in the path.
+        # self.path[i] will have the number distances[i] in the grid. Meaning, distances[i] = self.path[i+1] - self.path[i]
+        self.path = []
         distances = []
 
-        current_square = (0, 0)
+        current_square = (0, 0) # Working current square.
+
         bad_squares = [] # Squares that have no neighbors that are not in the path.
         affected_squares = [] # Squares that are reachable from the path.
 
         while current_square != (self.m - 1, self.n - 1):
+            # Debugging print line
+            # print(f'Path: {self.path}\nCurrent square: {current_square}\nBad squares: {bad_squares}\nAffected squares: {affected_squares}\nDistances: {distances}\n\n')
             
             # Pick a random neighbor that is not in the path.
             possible_neighbors = self.all_neighbors_and_distances(current_square, difficulty_bias=difficulty_bias)
             for distance, neighbor in possible_neighbors:
 
                 # Found next square if it is 
-                # 1) A new square ie not in the path
-                # 2) Not a bad square ie has neighbors that are not in the path
-                # 3) Does not touch the path with a certain distance
-                if neighbor not in self.path and neighbor not in bad_squares and all(neighbor not in as_ for as_ in affected_squares):
+                # 1) Not a bad square. That is, it has not been tried before.
+                # 2) Not an affected square. That is, It is not reachable from an earlier point in the path.
+                # 3) Not be the same distance as the goal but not be the goal. That is, must not create a shortcut.
+                
+                # For 1) and 2)
+                if neighbor not in bad_squares and all(neighbor not in as_ for as_ in affected_squares):
+                    
+                    # For 3)
+                    if neighbor != (self.m - 1, self.n - 1) and distance == (abs(current_square[0] - (self.m - 1)) + abs(current_square[1] - (self.n - 1))):
+                        continue
+                    
                     next_square = neighbor
                     next_to_distance = distance
                     bad_squares = []
@@ -116,12 +128,13 @@ class Board:
                 distances.pop()
                 continue
 
-            self.path.append(next_square)
+            self.path.append(current_square)
             affected_squares.append(self.neighbors(current_square, next_to_distance))
             distances.append(next_to_distance)
             current_square = next_square
 
         # Mark all the squares in the path
+        self.path.append((self.m - 1, self.n - 1))
         for square, distance in zip(self.path, distances):
             self.board[square[0]][square[1]] = distance
 
@@ -268,16 +281,26 @@ class Board:
 
 # print(b)
 
-concerns = []
+concerns = [16]
 
 if __name__ == "__main__":
-    random.seed(42)
-    b = Board(4, 4, max_distance=3)
-    b.create_random_path(difficulty_bias=0.25)
-    b.fill_remaining_squares(show_duds=True, restart_for_zeros=False)
-    print(b)
 
 
+    # DEBUGGING BOARDS
+
+    for seed in range(1, 31):
+    # for seed in concerns:
+        random.seed(42 + seed)
+        b = Board(7, 7, max_distance=6)
+        b.create_random_path(difficulty_bias=0.25)
+        b.fill_remaining_squares(show_duds=False, restart_for_zeros=False)
+        b.create_board_image(filename=f"debugging_boards/{seed}.png", show_path=True)
+        # print(b)
+        print(f'Board {seed} created.')
+
+
+
+    # RECOLORING BOARDS
 
     # for board_index in range(1, 36):
     #     difficulty = 'hard'
@@ -290,27 +313,8 @@ if __name__ == "__main__":
     #     print(f'Board {board_index} created. ({difficulty})')
 
 
-    # for board_index in range(1, 36):
-    # for board_index in concerns:
-    #     b = Board(4, 4, max_distance=3)
-    #     b.create_random_path(difficulty_bias=0.15 + 0.1*(board_index/30))
-    #     b.fill_remaining_squares(show_duds=False, restart_for_zeros=True)
-    #     b.create_board_text_file(filename=f"boards/easy/jumping_julia_board_{board_index}.txt")
-    #     b.create_path_text_file(filename=f"boards/easy/jumping_julia_path_{board_index}.txt")
-    #     b.create_board_image(filename=f"boards/easy/jumping_julia_board_{board_index}.png")
-    #     b.create_board_image(filename=f"boards/easy/jumping_julia_solution_{board_index}.png", show_path=True)
-    #     print(f'Board {board_index} created. (easy)')
-
-    # for board_index in range(1, 36):
-    # for board_index in concerns:
-    #     b = Board(6, 6)
-    #     b.create_random_path(difficulty_bias=0.15 + 0.1*(board_index/30))
-    #     b.fill_remaining_squares(show_duds=False, restart_for_zeros=True)
-    #     b.create_board_text_file(filename=f"boards/medium/jumping_julia_board_{board_index}.txt")
-    #     b.create_path_text_file(filename=f"boards/medium/jumping_julia_path_{board_index}.txt")
-    #     b.create_board_image(filename=f"boards/medium/jumping_julia_board_{board_index}.png")
-    #     b.create_board_image(filename=f"boards/medium/jumping_julia_solution_{board_index}.png", show_path=True)
-    #     print(f'Board {board_index} created. (medium)')
+    
+    # CREATING BOARDS
 
     # for board_index in range(1, 36):
     # for board_index in concerns:

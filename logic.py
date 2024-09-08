@@ -4,6 +4,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from matplotlib import colormaps
 from matplotlib.colors import Normalize
 import pickle
+import numpy as np
 
 
 class Board:
@@ -288,6 +289,16 @@ class Board:
                 f.write(" ".join(str(x) for x in row) + '\n')
 
 
+    @classmethod
+    def from_pickle(cls, filename):
+        """
+        This is a class method to create a board object from a pickle file for the board as a list.
+        """
+        
+        board_array = pickle.load(open(filename, "rb"))
+        b = cls(len(board_array), len(board_array[0]))
+        b.board = board_array        
+        return b
 
 
 # print(b)
@@ -295,22 +306,23 @@ class Board:
 concerns = []
 
 if __name__ == "__main__":
+    pass
 
+    
 
     # DEBUGGING BOARDS
 
-    for seed in range(1, 201):
+    # for seed in range(0, 1000):
     # for seed in concerns:
-        random.seed(42 + seed)
-        b = Board(6, 6, max_distance=6)
-        b.create_random_path(difficulty_bias=0.25)
-        b.fill_remaining_squares(show_duds=False, restart_for_zeros=False)
-        b.create_board_image(filename=f"debugging_boards/{seed}.png", show_path=True)
-        # print(b)
-        print(f'Board {seed} created.')
+        # random.seed(42 + seed)
+        # b = Board(6, 6, max_distance=6)
+        # b.create_random_path(difficulty_bias=0.25)
+        # b.fill_remaining_squares(show_duds=False, restart_for_zeros=False)
+        # b.create_board_image(filename=f"debugging_boards/{seed}.png", show_path=True)
+        # print(f'Board {seed} created.')
         
-        pickle.dump(b.board, open(f"debugging_boards/pickle_{seed}.pkl", "wb"))
-        print(f'Board {seed} pickled.')
+        # pickle.dump(b.board, open(f"debugging_boards/pickle_{seed}.pkl", "wb"))
+        # print(f'Board {seed} pickled.')
 
 
 

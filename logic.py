@@ -3,6 +3,7 @@ import random
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from matplotlib import colormaps
 from matplotlib.colors import Normalize
+import pickle
 
 
 class Board:
@@ -291,22 +292,25 @@ class Board:
 
 # print(b)
 
-concerns = [16]
+concerns = []
 
 if __name__ == "__main__":
 
 
     # DEBUGGING BOARDS
 
-    for seed in range(1, 31):
+    for seed in range(1, 201):
     # for seed in concerns:
         random.seed(42 + seed)
-        b = Board(7, 7, max_distance=6)
+        b = Board(6, 6, max_distance=6)
         b.create_random_path(difficulty_bias=0.25)
         b.fill_remaining_squares(show_duds=False, restart_for_zeros=False)
         b.create_board_image(filename=f"debugging_boards/{seed}.png", show_path=True)
         # print(b)
         print(f'Board {seed} created.')
+        
+        pickle.dump(b.board, open(f"debugging_boards/pickle_{seed}.pkl", "wb"))
+        print(f'Board {seed} pickled.')
 
 
 

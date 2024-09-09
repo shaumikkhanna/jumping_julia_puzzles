@@ -3,21 +3,24 @@ from collections import Counter
 import numpy as np
 
 
+NUMBER_OF_BOARDS = 300
+
+
 boards = []
 board_counters = []
-for seed in range(1000):
+for seed in range(NUMBER_OF_BOARDS):
     with open(f'debugging_boards/pickle_{seed}.pkl', 'rb') as f:
         board = pickle.load(f)
         boards.append(board)
         board_counter = Counter(cell for row in board for cell in row)
-        board_counters.append(np.array([board_counter[tile] for tile in range(1, 7)]))
+        board_counters.append(np.array([board_counter[tile] for tile in range(1, 6)]))
 
 
 def distance_between_boards(b1, b2):
     return sum(abs(b1 - b2))
 
 
-distance_matrix = np.zeros((1000, 1000))
+distance_matrix = np.zeros((NUMBER_OF_BOARDS, NUMBER_OF_BOARDS))
 for i, b1 in enumerate(board_counters):
     for j, b2 in enumerate(board_counters):
         distance_matrix[i, j] = distance_between_boards(b1, b2)
@@ -53,7 +56,7 @@ def find_maximal_set(adj_matrix, prefered_node_index, max_distance):
 
 
 # Find the maximal set of nodes
-for pref_node in range(1000):
+for pref_node in range(NUMBER_OF_BOARDS):
     maximal_nodes = find_maximal_set(distance_matrix, prefered_node_index=pref_node, max_distance=6)
-    if len(maximal_nodes) > 9:
+    if len(maximal_nodes) > 8:
         print(f"Number of nodes in the maximal set for {pref_node}: {len(maximal_nodes)} -- {maximal_nodes}")
